@@ -1,0 +1,35 @@
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondaryPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondarySortKey;
+
+@DynamoDbBean
+public class {{ class_name }} {
+{%- for attribute in attributes %}
+    private {{ attribute.type }} {{ attribute.name }};
+{%- endfor %}
+
+{% for attribute in attributes %}
+    {%- if attribute.is_hash_key %}
+    @DynamoDbPartitionKey{% endif %} 
+    {%- if attribute.is_sort_key %}
+    @DynamoDbSortKey{% endif %}
+    {%- for gsi_name, key_type in attribute.is_gsi_key.items() %}
+        {%- if key_type == 'HASH' %}
+    @DynamoDbSecondaryPartitionKey(indexNames = "{{ gsi_name }}")
+        {%- elif key_type == 'RANGE' %}
+    @DynamoDbSecondarySortKey(indexNames = "{{ gsi_name }}")
+        {%- endif %}
+    {%- endfor %}
+    @DynamoDbAttribute(value = "{{ attribute.name }}")
+    public {{ attribute.type }} get{{ attribute.name|capitalize }}() {
+        return {{ attribute.name }};
+    }
+
+    public void set{{ attribute.name|capitalize }}({{ attribute.type }} {{ attribute.name }}) {
+        this.{{ attribute.name }} = {{ attribute.name }};
+    }
+{% endfor %}
+}
