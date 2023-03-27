@@ -22,10 +22,10 @@ python main.py <table_name>
 
 ### 一括出力する例
 ```bash
-aws dynamodb list-tables | jq -r '.TableNames[]' | xargs -I {} sh -c 'echo "Processing table: {}"; python main.py "{}" > "{}.java"; echo "Saved to {}.java"'
+aws dynamodb list-tables | jq -r '.TableNames[]' | xargs -I {} sh -c 'echo "Processing table: {}"; python main.py "{}" > "out/{}.java"; echo "Saved to {}.java"'
 ```
 
-このワンライナーは、`aws-cli`と`jq`を使用してDynamoDBテーブルの一覧を取得し、`xargs`を使って`main.py`を複数回呼び出して各テーブルに対してJavaコードを生成し、それぞれのJavaコードを`<テーブル名>.java`という名前のファイルに保存します。
+このワンライナーは、`aws-cli`と`jq`を使用してDynamoDBテーブルの一覧を取得し、`xargs`を使って`main.py`を複数回呼び出して各テーブルに対してJavaコードを生成し、それぞれのJavaコードを`out/<テーブル名>.java`という名前のファイルに保存します。
 
 ## テンプレートファイルについて
 `dynamodb_bean_template.j2`ファイルは、Jinja2テンプレートエンジンを使用してJava Beanソースコードを生成するためのテンプレートファイルです。このファイルを編集することで、生成されるJavaコードの構造やスタイルをカスタマイズできます。
